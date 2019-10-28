@@ -5,9 +5,16 @@ using System.Text;
 
 namespace BattleShip.BattleshipApiEntities
 {
+
+    /// <summary>
+    /// 10x10 Battleship board.
+    /// </summary>
     [Serializable]
     public class BattleshipBoard : IBoard
     {
+        /// <summary>
+        /// Atomic item of a board the cellular items.
+        /// </summary>
         public List<IBoardCell> BoardCells { get; set; }
 
         private BattleshipBoard()
@@ -22,6 +29,10 @@ namespace BattleShip.BattleshipApiEntities
             }
         }
 
+        /// <summary>
+        /// Creates the board for you.
+        /// </summary>
+        /// <returns>The newly created board.</returns>
         public static IBoard CreateBoard()
         {
             IBoard battleshipBoard = new BattleshipBoard();

@@ -8,6 +8,10 @@ using System.Text;
 
 namespace ShipAttacker
 {
+    /// <summary>
+    /// Chetan Garg: 28th October 2019
+    /// This class contains the logic to perform an attack on a battleship and return whether it is a hit or miss.
+    /// </summary>
     public class BattleshipAttacker : IShipAttacker
     {
         ILogger _logger;
@@ -15,6 +19,13 @@ namespace ShipAttacker
         {
             _logger = logger;
         }
+
+        /// <summary>
+        /// Perform an attack on the supplied board and return the outcome.
+        /// </summary>
+        /// <param name="board">The current board on which the attack will be performed.</param>
+        /// <param name="cellToAttack">The board position on which the attack will be performed.</param>
+        /// <returns>Outcome of the attack. Whether it is a Hit or a Miss.</returns>
         public AttackResult AttackShip(IBoard board, IBoardCell cellToAttack)
         {
             if (board == null)

@@ -8,17 +8,30 @@ using System.Linq;
 
 namespace BoardGameCoordinator
 {
+    /// <summary>
+    /// Chetan Garg: 28 Oct 2019
+    /// Processing class that performs all the operations related to the game board.
+    /// </summary>
     public class BattleshipCoordinator : IBoardCoordinator
     {
         ILogger _logger;
         IShipPlacementValidator _validator;
         IShipAttacker _attacker;
+
         public BattleshipCoordinator(ILogger logger, IShipPlacementValidator validator, IShipAttacker attacker)
         {
             _logger = logger;
             _validator = validator;
             _attacker = attacker;
         }
+        
+        /// <summary>
+        /// Add a battleship to the board at a specified position.
+        /// </summary>
+        /// <param name="board">Current board.</param>
+        /// <param name="startCell">Starting position where the battleship has to be placed.</param>
+        /// <param name="ship">The battleship that needs to be placed.</param>
+        /// <returns></returns>
         public bool AddBattleship(IBoard board, IBoardCell startCell, IShip ship)
         {
             if (board == null || startCell == null || ship == null)
@@ -43,6 +56,12 @@ namespace BoardGameCoordinator
             return false;
         }
 
+        /// <summary>
+        /// Perform a specified attack on the board.
+        /// </summary>
+        /// <param name="board">Current Board.</param>
+        /// <param name="cellToAttack">Cell information that needs to be attacked.</param>
+        /// <returns>Returns the output of an attack.</returns>
         public AttackResult Attack(IBoard board, IBoardCell cellToAttack)
         {
             if (board == null)
@@ -58,6 +77,10 @@ namespace BoardGameCoordinator
             return _attacker.AttackShip(board, cellToAttack);
         }
 
+        /// <summary>
+        /// Creates a 10x10 board,
+        /// </summary>
+        /// <returns>The blank board.</returns>
         public IBoard CreateBoard()
         {
             return BattleshipBoard.CreateBoard();

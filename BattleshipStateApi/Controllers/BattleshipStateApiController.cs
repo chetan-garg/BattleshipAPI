@@ -36,7 +36,7 @@ namespace BattleshipStateApi.Controllers
         }
 
         [HttpGet]
-        [Route("Create")]
+        [Route("Battleship/Create")]
         public IBoard Get()
         {
             try
@@ -58,7 +58,7 @@ namespace BattleshipStateApi.Controllers
         }
 
         [HttpPost]
-        [Route("AddBattleShip")]
+        [Route("Battleship/AddBattleShip")]
         public AddBattleshipResponse AddBattleShip([FromBody] AddBattleshipRequest request)
         {
             if (request == null)
@@ -105,7 +105,7 @@ namespace BattleshipStateApi.Controllers
         }
 
         [HttpPost]
-        [Route("Attack")]
+        [Route("Battleship/Attack")]
         public AttackResponse Attack([FromBody] AttackRequest request)
         {
             if (request == null)

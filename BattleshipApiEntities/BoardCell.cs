@@ -3,6 +3,10 @@ using System;
 
 namespace BattleShip.BattleshipApiEntities
 {
+
+    /// <summary>
+    /// Atomic item of a board the cellular items.
+    /// </summary>
     [Serializable]
     public class BoardCell : IBoardCell
     {

@@ -8,6 +8,9 @@ using ShipAttacker;
 
 namespace DependencyResolver
 {
+    /// <summary>
+    /// Static class to outsource the dependency resolution for the API and resolve the required dependencies.
+    /// </summary>
     public static class DependencyResolver
     {
         public static void ResolveDependencies(IServiceCollection services)
