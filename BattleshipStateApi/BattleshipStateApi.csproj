@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BattleshipApiEntities\BattleshipApiEntities.csproj" />
+    <ProjectReference Include="..\DependencyResolver\DependencyResolver.csproj" />
+  </ItemGroup>
+
+</Project>
