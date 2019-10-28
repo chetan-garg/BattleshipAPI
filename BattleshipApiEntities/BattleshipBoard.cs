@@ -5,6 +5,7 @@ using System.Text;
 
 namespace BattleShip.BattleshipApiEntities
 {
+    [Serializable]
     public class BattleshipBoard : IBoard
     {
         public List<IBoardCell> BoardCells { get; set; }

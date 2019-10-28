@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using BattleShip.BattleshipApiEntities;
 using BattleshipStateApi.Models;
@@ -19,8 +21,7 @@ namespace BattleshipStateApi.Controllers
     {
         private readonly ILogger<BattleshipStateApiController> _logger;
         private readonly IBoardCoordinator _boardCoordinator;
-        private static IBoard localBoard;
-
+        
         public BattleshipStateApiController(ILogger<BattleshipStateApiController> logger, IBoardCoordinator boardCoordinator)
         {
             _logger = logger;
@@ -31,7 +32,9 @@ namespace BattleshipStateApi.Controllers
         [Route("Create")]
         public IBoard Get()
         {
-            localBoard = _boardCoordinator.CreateBoard();
+            var localBoard = _boardCoordinator.CreateBoard();
+            
+            HttpContext.Session.Set("LocalB", BinaryBoardSerialiazer.SerializeObject(localBoard));
             return localBoard;
         }
 
@@ -44,12 +47,30 @@ namespace BattleshipStateApi.Controllers
                 throw new ArgumentException("The request object is null.");
             }
             var orientation = (OrientationType)Enum.Parse(typeof(OrientationType), request.Orientation);
-            bool result = _boardCoordinator.AddBattleship(localBoard, new BoardCell()
+
+            byte[] deserial;
+            bool canRead = HttpContext.Session.TryGetValue("LocalB", out deserial);
+            if (canRead)
             {
-                XCoordinate = request.XCoordinate,
-                YCoordinate = request.YCoordinate
-            }, new Battleship() { Orientation = orientation, Width = request.Width });
-            return new AddBattleshipResponse() { Result = result, Board = localBoard };
+                var localB = BinaryBoardSerialiazer.DeSerializeObject(deserial);
+                bool result = _boardCoordinator.AddBattleship(localB, new BoardCell()
+                {
+                    XCoordinate = request.XCoordinate,
+                    YCoordinate = request.YCoordinate
+                }, new Battleship() { Orientation = orientation, Width = request.Width });
+
+                HttpContext.Session.Set("LocalB", BinaryBoardSerialiazer.SerializeObject(localB));
+                return new AddBattleshipResponse() { Result = result, Board = localB };
+            }
+            else
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
+                {
+                    Content = new StringContent("The game board has not been created. Please create a game board before attacking."),
+                    ReasonPhrase = "Board Not Found."
+                };
+                throw new System.Web.Http.HttpResponseException(resp);
+            }
         }
 
         [HttpPost]
@@ -60,27 +81,39 @@ namespace BattleshipStateApi.Controllers
             {
                 throw new ArgumentException("The request object is null.");
             }
-            if (localBoard == null)
-            {
-                var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
-                {
-                    Content = new StringContent("The game board has not been created. Please create a game board before attacking."),
-                    ReasonPhrase = "Product ID Not Found"
-                };
-                throw new System.Web.Http.HttpResponseException(resp);
-            }
+            
             try
             {
-                var HitOrMiss = _boardCoordinator.Attack(localBoard, new BoardCell()
+                byte[] deserial;
+                bool canRead = HttpContext.Session.TryGetValue("LocalB", out deserial);
+                if (canRead)
                 {
-                    XCoordinate = request.XCoordinate,
-                    YCoordinate = request.YCoordinate
-                });
-                return new AttackResponse() { Board = localBoard, Result = Enum.GetName(typeof(AttackResult),HitOrMiss) };
+                    var localB = BinaryBoardSerialiazer.DeSerializeObject(deserial);
+                    var HitOrMiss = _boardCoordinator.Attack(localB, new BoardCell()
+                    {
+                        XCoordinate = request.XCoordinate,
+                        YCoordinate = request.YCoordinate
+                    });
+                    HttpContext.Session.Set("LocalB", BinaryBoardSerialiazer.SerializeObject(localB));
+                    return new AttackResponse() { Board = localB, Result = Enum.GetName(typeof(AttackResult), HitOrMiss) };
+                }
+                else
+                {
+                    var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
+                    {
+                        Content = new StringContent("The game board has not been created. Please create a game board before attacking."),
+                        ReasonPhrase = "Board Not Found"
+                    };
+                    throw new System.Web.Http.HttpResponseException(resp);
+                }
             }
             catch(Exception ex)
             {
-                throw new System.Web.Http.HttpResponseException(HttpStatusCode.InternalServerError);
+                throw new System.Web.Http.HttpResponseException(new HttpResponseMessage()
+                {
+                    Content = new StringContent(ex.Message),
+                    StatusCode = HttpStatusCode.InternalServerError
+                });
             }
             
         }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,7 +29,9 @@ namespace BattleshipStateApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<ILogger, Logger<BattleshipStateApiController>>();
+            services.AddTransient<IDistributedCache, MemoryDistributedCache>();
             DependencyResolver.DependencyResolver.ResolveDependencies(services);
+            services.AddSession();
             services.AddControllers();
         }
 
@@ -39,6 +42,8 @@ namespace BattleshipStateApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSession();
 
             app.UseHttpsRedirection();
 

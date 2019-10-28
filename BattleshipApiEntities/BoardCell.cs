@@ -3,6 +3,7 @@ using System;
 
 namespace BattleShip.BattleshipApiEntities
 {
+    [Serializable]
     public class BoardCell : IBoardCell
     {
         public bool Occupied { get; set; }
