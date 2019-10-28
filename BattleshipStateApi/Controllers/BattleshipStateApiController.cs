@@ -37,24 +37,24 @@ namespace BattleshipStateApi.Controllers
 
         [HttpPost]
         [Route("AddBattleShip")]
-        public IBoard AddBattleShip([FromBody] AddBattleshipRequest request)
+        public AddBattleshipResponse AddBattleShip([FromBody] AddBattleshipRequest request)
         {
             if (request == null)
             {
                 throw new ArgumentException("The request object is null.");
             }
             var orientation = (OrientationType)Enum.Parse(typeof(OrientationType), request.Orientation);
-            _boardCoordinator.AddBattleship(localBoard, new BoardCell()
+            bool result = _boardCoordinator.AddBattleship(localBoard, new BoardCell()
             {
                 XCoordinate = request.XCoordinate,
                 YCoordinate = request.YCoordinate
             }, new Battleship() { Orientation = orientation, Width = request.Width });
-            return localBoard;
+            return new AddBattleshipResponse() { Result = result, Board = localBoard };
         }
 
         [HttpPost]
         [Route("Attack")]
-        public AttackResult Attack([FromBody] AttackRequest request)
+        public AttackResponse Attack([FromBody] AttackRequest request)
         {
             if (request == null)
             {
@@ -76,7 +76,7 @@ namespace BattleshipStateApi.Controllers
                     XCoordinate = request.XCoordinate,
                     YCoordinate = request.YCoordinate
                 });
-                return HitOrMiss;
+                return new AttackResponse() { Board = localBoard, Result = Enum.GetName(typeof(AttackResult),HitOrMiss) };
             }
             catch(Exception ex)
             {
